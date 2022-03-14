@@ -24,10 +24,7 @@ void MessageQueue<T>::send(T &&msg)
 /* Implementation of class "TrafficLight" */
 
 /* 
-TrafficLight::TrafficLight()
-{
-    _currentPhase = TrafficLightPhase::red;
-}
+
 
 void TrafficLight::waitForGreen()
 {
@@ -36,23 +33,72 @@ void TrafficLight::waitForGreen()
     // Once it receives TrafficLightPhase::green, the method returns.
 }
 
-TrafficLightPhase TrafficLight::getCurrentPhase()
+*/
+
+void TrafficLight::simulate()
+{
+    // FP.2b : Finally, the private method cycleThroughPhases should be started in a thread when the public method simulate is called.
+    // To do this, use the thread queue in the base class. 
+    threads.emplace_back(std::thread(&TrafficLight::cycleThroughPhases, this));
+}
+
+
+TrafficLight::TrafficLight()
+{
+    _currentPhase = TrafficLightPhase::red;
+}
+
+TrafficLightPhase TrafficLight::getCurrentPhase() const
 {
     return _currentPhase;
 }
 
-void TrafficLight::simulate()
-{
-    // FP.2b : Finally, the private method „cycleThroughPhases“ should be started in a thread when the public method „simulate“ is called. To do this, use the thread queue in the base class. 
+void TrafficLight::setCurrentPhase(TrafficLightPhase phase){
+    _currentPhase = phase;
 }
 
 // virtual function which is executed in a thread
 void TrafficLight::cycleThroughPhases()
 {
+    
+    // initialize stopwatch
+    auto lastUpdate = std::chrono::system_clock::now();
+
+    // Random time init - The cycle duration should be a random value between 4 and 6 seconds. 
+    std::random_device rd;
+    std::mt19937 eng(rd());
+    double lower_bound = 4000.0; // ms
+    double upper_bound = 6000.0; // ms
+    std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
+    double random_time_4_to_6s = unif(eng);
+    
     // FP.2a : Implement the function with an infinite loop that measures the time between two loop cycles 
-    // and toggles the current phase of the traffic light between red and green and sends an update method 
-    // to the message queue using move semantics. The cycle duration should be a random value between 4 and 6 seconds. 
-    // Also, the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles. 
+    for(;;) {
+        // the while-loop should use std::this_thread::sleep_for to wait 1ms between two cycles.
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                            
+        // measure time between two loops
+        long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
+        
+        if(timeSinceLastUpdate > random_time_4_to_6s){
+
+            // toggles the current phase of the traffic light between red and green and sends an update method 
+            // to the message queue using move semantics. 
+            if(this->getCurrentPhase() == TrafficLightPhase::green){
+                setCurrentPhase(TrafficLightPhase::red);
+            }else{
+                setCurrentPhase(TrafficLightPhase::green);
+            }
+            
+            // TODO: send message to queue (not implemented at the moment of FP.2a)
+
+            // reset stopwatch time
+            lastUpdate = std::chrono::system_clock::now();
+            // new random time between 4...6 s
+            random_time_4_to_6s = unif(eng);
+        
+        }
+                    
+    }
 }
 
-*/
