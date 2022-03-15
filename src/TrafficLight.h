@@ -16,7 +16,7 @@ class Vehicle;
 template <class T>
 class MessageQueue {
 public:
-    MessageQueue();
+    MessageQueue() = default;
     T receive() ;
     void send(T&& msg);
 
@@ -38,7 +38,7 @@ enum class TrafficLightPhase {red, green};
 class TrafficLight : public TrafficObject {
   public:
     // constructor / desctructor
-    TrafficLight() = default;
+    TrafficLight();
 
     // getters / setters
     // as well as „TrafficLightPhase getCurrentPhase()“
