@@ -38,7 +38,7 @@ enum class TrafficLightPhase {red, green};
 class TrafficLight : public TrafficObject {
   public:
     // constructor / desctructor
-    TrafficLight();
+    TrafficLight() = default;
 
     // getters / setters
     // as well as „TrafficLightPhase getCurrentPhase()“
