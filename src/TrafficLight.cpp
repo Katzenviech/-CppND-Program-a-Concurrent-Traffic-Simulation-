@@ -29,6 +29,10 @@ void MessageQueue<T>::send(T&& msg)
     // perform vector modification under the lock
     std::lock_guard<std::mutex> uLock(_mutex);
 
+    // Taken from: https://knowledge.udacity.com/questions/770770
+    // all old messages are obsolete as soon as the light switches state
+    _queue.clear();
+
     // add vector to queue
     // std::cout << "   Message " << msg << " has been sent to the queue" << std::endl;
     _queue.push_back(std::move(msg));
